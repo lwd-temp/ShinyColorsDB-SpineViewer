@@ -77,17 +77,16 @@ async function renderByDrop(dataTexture) {
     const rawJson = PIXI.Assets.get("dropJson");
     const rawAtlas = PIXI.Assets.get("dropAtlas");
     const rawTexture = await blobToBase64(dataTexture);
-    // console.log(rawJson, rawAtlas, rawTexture);
-    const spineAtlas = new PIXI.spine.TextureAtlas(rawAtlas, (line, callback) => {
-        line = rawTexture;
+    //console.log(rawJson, rawAtlas, rawTexture);
+    const spineAtlas = new PIXI.spine.TextureAtlas(rawAtlas, (_, callback) => {
+        //line = rawTexture;
         callback(PIXI.BaseTexture.from(rawTexture));
     });
-    // const spineAtlasLoader = new PIXI.spine.AtlasAttachmentLoader(spineAtlas);
-    // console.log(spineAtlasLoader)
-    // const spineJsonParser = new PIXI.spine.SkeletonJson(spineAtlasLoader);
+    //const spineAtlasLoader = new PIXI.spine.core.AtlasAttachmentLoader(spineAtlas);
+    //const spineJsonParser = new PIXI.spine.core.SkeletonJson(spineAtlasLoader);
     const spineJsonParser = new PIXI.spine.SkeletonJson();
     const spineData = spineJsonParser.readSkeletonData(spineAtlas, rawJson);
-    setupAnimationList(spineData);
+    await setupAnimationList(spineData);
 }
 
 function toastInit() {
@@ -136,7 +135,14 @@ async function init() {
 
     resetBtn.onclick = () => {
         resetAllAnimation();
-    };
+    }
+
+    const continuousShootingModeSwitch = document.getElementById("continuousShootingModeSwitch")
+    continuousShootingModeSwitch.addEventListener("change", (event) => {
+        isContinuousShootingEnabled = event.target.checked
+        // console.info(`enableContinuousShooting:${isContinuousShootingEnabled}`)
+    });
+
 
     fetch("https://api.shinycolors.moe/spine/idollist").then(async (response) => {
         const idolInfo = await response.json();
